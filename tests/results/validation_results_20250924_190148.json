@@ -1,0 +1,103 @@
+{
+  "metrics": {
+    "accuracy_percent": 100.0,
+    "false_positive_rate_percent": 0.0,
+    "false_negative_rate_percent": 0.0,
+    "total_tests": 8,
+    "passed_tests": 8,
+    "failed_tests": 0,
+    "avg_analysis_time_ms": 5.537083125091158,
+    "max_analysis_time_ms": 10.893708007643,
+    "true_positives": 3,
+    "true_negatives": 5,
+    "false_positives": 0,
+    "false_negatives": 0
+  },
+  "results": [
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/clean_code/clean_preprocessing.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 0,
+      "actual_types": [],
+      "success": true,
+      "analysis_time_ms": 10.893708007643
+    },
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/clean_code/clean_reproducibility.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 0,
+      "actual_types": [],
+      "success": true,
+      "analysis_time_ms": 4.770999992615543
+    },
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/clean_code/clean_gpu_usage.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 0,
+      "actual_types": [],
+      "success": true,
+      "analysis_time_ms": 8.615041006123647
+    },
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/problematic_code/data_leakage_preprocessing.py",
+      "expected_errors": 1,
+      "expected_types": [
+        "data_leakage_preprocessing"
+      ],
+      "actual_errors": 1,
+      "actual_types": [
+        "data_leakage_preprocessing"
+      ],
+      "success": true,
+      "analysis_time_ms": 4.673916002502665
+    },
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/problematic_code/missing_random_state.py",
+      "expected_errors": 1,
+      "expected_types": [
+        "missing_random_seed"
+      ],
+      "actual_errors": 1,
+      "actual_types": [
+        "missing_random_seed"
+      ],
+      "success": true,
+      "analysis_time_ms": 3.4899580059573054
+    },
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/problematic_code/gpu_memory_leak.py",
+      "expected_errors": 1,
+      "expected_types": [
+        "gpu_memory_leak"
+      ],
+      "actual_errors": 1,
+      "actual_types": [
+        "gpu_memory_leak"
+      ],
+      "success": true,
+      "analysis_time_ms": 4.0250000020023435
+    },
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/edge_cases/global_seed_set.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 0,
+      "actual_types": [],
+      "success": true,
+      "analysis_time_ms": 2.9607499891426414
+    },
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/edge_cases/contextual_fixes.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 0,
+      "actual_types": [],
+      "success": true,
+      "analysis_time_ms": 4.867291994742118
+    }
+  ],
+  "total_time_seconds": 0.04480314254760742
+}

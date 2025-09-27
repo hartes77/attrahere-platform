@@ -1,0 +1,126 @@
+{
+  "metrics": {
+    "accuracy_percent": 0.0,
+    "false_positive_rate_percent": 62.5,
+    "false_negative_rate_percent": 37.5,
+    "total_tests": 8,
+    "passed_tests": 0,
+    "failed_tests": 8,
+    "avg_analysis_time_ms": 6.317666749964701,
+    "max_analysis_time_ms": 12.922458998218644,
+    "true_positives": 0,
+    "true_negatives": 0,
+    "false_positives": 5,
+    "false_negatives": 3
+  },
+  "results": [
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/clean_code/clean_preprocessing.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 1,
+      "actual_types": [
+        "magic_hyperparameter"
+      ],
+      "success": false,
+      "analysis_time_ms": 12.922458998218644
+    },
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/clean_code/clean_reproducibility.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 2,
+      "actual_types": [
+        "magic_hyperparameter",
+        "magic_hyperparameter"
+      ],
+      "success": false,
+      "analysis_time_ms": 10.866459000681061
+    },
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/clean_code/clean_gpu_usage.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 7,
+      "actual_types": [
+        "magic_hyperparameter",
+        "magic_hyperparameter",
+        "magic_hyperparameter",
+        "magic_dimension",
+        "magic_dimension",
+        "missing_random_seed",
+        "missing_random_seed"
+      ],
+      "success": false,
+      "analysis_time_ms": 8.915124999475665
+    },
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/problematic_code/data_leakage_preprocessing.py",
+      "expected_errors": 1,
+      "expected_types": [
+        "data_leakage_preprocessing"
+      ],
+      "actual_errors": 3,
+      "actual_types": [
+        "magic_hyperparameter",
+        "missing_random_seed",
+        "data_leakage_preprocessing"
+      ],
+      "success": false,
+      "analysis_time_ms": 3.9818750010454096
+    },
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/problematic_code/missing_random_state.py",
+      "expected_errors": 1,
+      "expected_types": [
+        "missing_random_seed"
+      ],
+      "actual_errors": 2,
+      "actual_types": [
+        "magic_hyperparameter",
+        "missing_random_seed"
+      ],
+      "success": false,
+      "analysis_time_ms": 3.456459002336487
+    },
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/problematic_code/gpu_memory_leak.py",
+      "expected_errors": 1,
+      "expected_types": [
+        "gpu_memory_leak"
+      ],
+      "actual_errors": 4,
+      "actual_types": [
+        "magic_hyperparameter",
+        "gpu_memory_leak",
+        "missing_random_seed",
+        "missing_random_seed"
+      ],
+      "success": false,
+      "analysis_time_ms": 3.412665995710995
+    },
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/edge_cases/global_seed_set.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 1,
+      "actual_types": [
+        "missing_random_seed"
+      ],
+      "success": false,
+      "analysis_time_ms": 2.901833002397325
+    },
+    {
+      "file_path": "/Users/rossellacarraro/Desktop/projects/Ml code quality platform/tests/validation_suite/edge_cases/contextual_fixes.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 1,
+      "actual_types": [
+        "missing_random_seed"
+      ],
+      "success": false,
+      "analysis_time_ms": 4.08445799985202
+    }
+  ],
+  "total_time_seconds": 0.050898075103759766
+}
