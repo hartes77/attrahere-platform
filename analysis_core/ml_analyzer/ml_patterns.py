@@ -586,6 +586,36 @@ class MagicNumberExtractor:
 
     def __init__(self):
         self.ml_contexts = ['learning_rate', 'lr', 'batch_size', 'epochs', 'hidden_size']
+        
+        # Standard ML values that are commonly accepted (not magic numbers)
+        self.standard_ml_values = {
+            0, 1, -1,      # Basic values
+            0.2, 0.3, 0.8, # Common test/validation split ratios
+            42, 123, 0,    # Common random seeds
+            0.01, 0.001,   # Common learning rates
+            32, 64, 128,   # Common batch sizes
+            100, 1000,     # Common epoch/iteration counts
+        }
+        
+        # Parameter contexts where certain values are expected and acceptable
+        self.parameter_contexts = {
+            'test_size': {0.1, 0.15, 0.2, 0.25, 0.3, 0.33},  # Standard test split ratios
+            'val_size': {0.1, 0.15, 0.2, 0.25},              # Standard validation split ratios
+            'random_state': {0, 42, 123, 1337},              # Common random seeds
+            'random_seed': {0, 42, 123, 1337},               # Alternative random seed param
+            'n_jobs': {-1, 1, 2, 4, 8},                      # Common parallel job counts
+            'batch_size': {1, 8, 16, 32, 64, 128, 256, 512}, # Common batch sizes
+        }
+        
+        # Common neural network dimensions (not magic numbers)
+        self.standard_nn_dimensions = {
+            # Input/output common sizes
+            1, 2, 3, 10, 28, 32, 64, 128, 256, 512, 784, 1024,
+            # Common hidden layer sizes
+            16, 32, 64, 128, 256, 512, 1024, 2048,
+            # Common embedding dimensions
+            50, 100, 128, 200, 256, 300, 512,
+        }
 
     def detect_patterns(self, analysis: ASTAnalysisResult) -> List[MLAntiPattern]:
         """Detect magic numbers in ML contexts"""
@@ -607,7 +637,7 @@ class MagicNumberExtractor:
                     # Check positional arguments
                     for i, arg in enumerate(node.args):
                         if isinstance(arg, ast.Constant) and isinstance(arg.value, (int, float)):
-                            if arg.value not in [0, 1, -1]:  # Ignore obvious non-magic numbers
+                            if self._is_magic_number(arg.value, None):  # Use enhanced magic number detection
                                 patterns.append(MLAntiPattern(
                                     pattern_type="magic_hyperparameter",
                                     severity=PatternSeverity.MEDIUM,
@@ -627,7 +657,7 @@ class MagicNumberExtractor:
                     # Check keyword arguments
                     for keyword in node.keywords:
                         if isinstance(keyword.value, ast.Constant) and isinstance(keyword.value.value, (int, float)):
-                            if keyword.value.value not in [0, 1, -1]:  # Ignore obvious non-magic numbers
+                            if self._is_magic_number(keyword.value.value, keyword.arg):  # Use context-aware detection
                                 patterns.append(MLAntiPattern(
                                     pattern_type="magic_hyperparameter",
                                     severity=PatternSeverity.MEDIUM,
@@ -660,7 +690,8 @@ class MagicNumberExtractor:
 
                 for arg in node.args:
                     if isinstance(arg, ast.Constant) and isinstance(arg.value, int):
-                        if arg.value > 10:  # Likely a magic dimension
+                        # Enhanced magic dimension detection with context awareness
+                        if self._is_magic_dimension(arg.value, node.func.attr):  # Use context-aware detection
                             patterns.append(MLAntiPattern(
                                 pattern_type="magic_dimension",
                                 severity=PatternSeverity.LOW,
@@ -679,9 +710,17 @@ class MagicNumberExtractor:
     def _is_ml_constructor(self, node: ast.Call) -> bool:
         """Check if this is an ML model/optimizer constructor"""
         ml_constructors = {
-            'LinearRegression', 'RandomForestClassifier', 'SVC',
-            'Adam', 'SGD', 'AdamW',
-            'Linear', 'Conv2d', 'LSTM'
+            # Sklearn models
+            'LinearRegression', 'RandomForestClassifier', 'SVC', 'LogisticRegression',
+            'DecisionTreeClassifier', 'GradientBoostingClassifier', 'KNeighborsClassifier',
+            # Sklearn utilities
+            'train_test_split', 'cross_val_score', 'GridSearchCV', 'RandomizedSearchCV',
+            # Neural network optimizers
+            'Adam', 'SGD', 'AdamW', 'RMSprop',
+            # PyTorch layers
+            'Linear', 'Conv2d', 'LSTM', 'BatchNorm2d', 'Dropout',
+            # TensorFlow/Keras
+            'Dense', 'Conv2D', 'LSTM', 'Dropout', 'BatchNormalization'
         }
 
         if isinstance(node.func, ast.Name):
@@ -691,6 +730,68 @@ class MagicNumberExtractor:
 
         return False
 
+    def _is_magic_number(self, value: Union[int, float], parameter_name: Optional[str] = None) -> bool:
+        """Enhanced magic number detection with context awareness"""
+        # Check if it's a standard ML value
+        if value in self.standard_ml_values:
+            return False
+            
+        # Check parameter-specific contexts
+        if parameter_name and parameter_name in self.parameter_contexts:
+            if value in self.parameter_contexts[parameter_name]:
+                return False
+                
+        # Additional contextual rules
+        if parameter_name:
+            # Learning rates are typically small decimals
+            if 'lr' in parameter_name.lower() or 'learning_rate' in parameter_name.lower():
+                if 0.0001 <= value <= 0.1:
+                    return False
+                    
+            # Batch sizes are typically powers of 2 or common values
+            if 'batch' in parameter_name.lower():
+                if value in {1, 8, 16, 32, 64, 128, 256, 512, 1024}:
+                    return False
+                    
+            # Epochs/iterations are typically round numbers
+            if any(keyword in parameter_name.lower() for keyword in ['epoch', 'iter', 'step']):
+                if isinstance(value, int) and 1 <= value <= 10000:
+                    return False
+                    
+            # Neural network layer dimensions
+            if any(keyword in parameter_name.lower() for keyword in ['hidden', 'embed', 'dim', 'size']):
+                if value in self.standard_nn_dimensions:
+                    return False
+                    
+        # If none of the above exceptions apply, it's likely a magic number
+        return True
+    
+    def _is_magic_dimension(self, value: int, context: str) -> bool:
+        """Enhanced magic dimension detection with neural network context awareness"""
+        # Common standard dimensions are never magic
+        if value in self.standard_nn_dimensions:
+            return False
+            
+        # Context-specific rules
+        if context:
+            # Linear layers: input/output dimensions
+            if context == 'Linear':
+                # Very common sizes in tutorials and standard architectures
+                if value in {784, 10, 1000}:  # MNIST (28*28), CIFAR-10 classes, ImageNet classes
+                    return False
+                    
+            # Convolutional layers: typically powers of 2 or small numbers
+            if context in ['Conv2d', 'Conv1d']:
+                if value in {1, 3, 5, 7, 11}:  # Common kernel sizes
+                    return False
+                    
+        # Small dimensions (< 10) are typically not magic
+        if value <= 10:
+            return False
+            
+        # If it's a large dimension not in our whitelist, it's likely magic
+        return True
+    
     def _generate_config_fix(self, value: Union[int, float]) -> str:
         """Generate configuration file suggestion"""
         return f"""# config.yaml
@@ -757,13 +858,21 @@ class ReproducibilityChecker:
                         for kw in node.keywords
                     )
 
-                    # For numpy random functions, check if global seed is set
-                    is_numpy_random = (isinstance(node.func, ast.Attribute) and
-                                     isinstance(node.func.value, ast.Attribute) and
-                                     node.func.value.attr == 'random')
+                    # For random functions that are covered by global seed, check if global seed is set
+                    is_covered_by_global_seed = (
+                        # numpy.random functions (np.random.*)
+                        (isinstance(node.func, ast.Attribute) and
+                         isinstance(node.func.value, ast.Attribute) and
+                         node.func.value.attr == 'random') or
+                        # sklearn functions that respect numpy global seed
+                        func_name in ['shuffle', 'sample'] or
+                        # direct numpy random calls after 'from numpy import random'
+                        (isinstance(node.func, ast.Name) and 
+                         func_name in ['rand', 'randn', 'choice'])
+                    )
 
-                    # Skip numpy random functions if global seed is set
-                    if is_numpy_random and has_global_seed:
+                    # Skip functions covered by global seed when global seed is set
+                    if is_covered_by_global_seed and has_global_seed:
                         continue
 
                     if not has_random_state:
