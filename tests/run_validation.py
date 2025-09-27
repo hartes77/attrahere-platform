@@ -17,10 +17,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List
 
-# Add analysis-core to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "analysis-core"))
+# Add analysis_core to path (corrected for V3 unified structure)
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from ml_analyzer.analyzer import MLCodeAnalyzer
+from analysis_core.ml_analyzer.analyzer import MLCodeAnalyzer
 
 
 @dataclass

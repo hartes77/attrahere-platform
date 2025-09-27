@@ -438,8 +438,24 @@ class GPUMemoryLeakDetector:
         """Check if an expression is likely to produce a tensor"""
         if isinstance(expr, ast.Name):
             # Check if it's a known tensor variable
-            return expr.id in tensor_vars or any(keyword in expr.id.lower() for keyword in
-                                               ['tensor', 'output', 'prediction', 'loss', 'result'])
+            if expr.id in tensor_vars:
+                return True
+            
+            var_name = expr.id.lower()
+            
+            # Direct tensor indicators
+            tensor_keywords = ['tensor', 'output', 'prediction', 'logits', 'features']
+            if any(keyword in var_name for keyword in tensor_keywords):
+                return True
+                
+            # Loss variables are tensors UNLESS they have scalar prefixes
+            if 'loss' in var_name:
+                # Exclude scalar computations
+                scalar_prefixes = ['avg', 'mean', 'final', 'total', 'sum']
+                if not any(prefix in var_name for prefix in scalar_prefixes):
+                    return True
+                    
+            return False
 
         elif isinstance(expr, ast.Call):
             # Check if it's a tensor-returning function call
@@ -610,7 +626,7 @@ class MagicNumberExtractor:
         # Common neural network dimensions (not magic numbers)
         self.standard_nn_dimensions = {
             # Input/output common sizes
-            1, 2, 3, 10, 28, 32, 64, 128, 256, 512, 784, 1024,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 28, 32, 64, 128, 256, 512, 784, 1024,
             # Common hidden layer sizes
             16, 32, 64, 128, 256, 512, 1024, 2048,
             # Common embedding dimensions
@@ -637,7 +653,8 @@ class MagicNumberExtractor:
                     # Check positional arguments
                     for i, arg in enumerate(node.args):
                         if isinstance(arg, ast.Constant) and isinstance(arg.value, (int, float)):
-                            if self._is_magic_number(arg.value, None):  # Use enhanced magic number detection
+                            # For positional args, we don't have parameter context, so be more lenient
+                            if self._is_magic_number_in_constructor(arg.value):  # Use constructor-specific detection
                                 patterns.append(MLAntiPattern(
                                     pattern_type="magic_hyperparameter",
                                     severity=PatternSeverity.MEDIUM,
@@ -726,7 +743,14 @@ class MagicNumberExtractor:
         if isinstance(node.func, ast.Name):
             return node.func.id in ml_constructors
         elif isinstance(node.func, ast.Attribute):
-            return node.func.attr in ml_constructors
+            # Check direct attribute (e.g., torch.Linear)
+            if node.func.attr in ml_constructors:
+                return True
+            # Check for nn.* patterns (e.g., nn.Linear, nn.Conv2d)
+            if (isinstance(node.func.value, ast.Name) and 
+                node.func.value.id in ['nn', 'torch.nn'] and
+                node.func.attr in ml_constructors):
+                return True
 
         return False
 
@@ -792,6 +816,27 @@ class MagicNumberExtractor:
         # If it's a large dimension not in our whitelist, it's likely magic
         return True
     
+    def _is_magic_number_in_constructor(self, value: Union[int, float]) -> bool:
+        """Special magic number detection for constructor arguments (more lenient)"""
+        # Standard ML values are never magic
+        if value in self.standard_ml_values:
+            return False
+            
+        # Neural network dimensions are never magic
+        if isinstance(value, int) and value in self.standard_nn_dimensions:
+            return False
+            
+        # Small integers (1-20) are typically legitimate in constructors
+        if isinstance(value, int) and 1 <= value <= 20:
+            return False
+            
+        # Common decimal values in ML
+        if isinstance(value, float) and value in {0.01, 0.001, 0.1, 0.5, 0.2, 0.8}:
+            return False
+            
+        # If none of the above exceptions apply, it's likely a magic number
+        return True
+    
     def _generate_config_fix(self, value: Union[int, float]) -> str:
         """Generate configuration file suggestion"""
         return f"""# config.yaml
@@ -836,7 +881,9 @@ class ReproducibilityChecker:
 
         random_functions = [
             'train_test_split', 'shuffle', 'sample',
-            'RandomForestClassifier', 'random', 'rand', 'randn'
+            'RandomForestClassifier', 'random', 'rand', 'randn',
+            # PyTorch random functions
+            'randn', 'rand', 'randint', 'normal', 'uniform'
         ]
 
         # Check if there's a global seed set
@@ -864,6 +911,11 @@ class ReproducibilityChecker:
                         (isinstance(node.func, ast.Attribute) and
                          isinstance(node.func.value, ast.Attribute) and
                          node.func.value.attr == 'random') or
+                        # torch functions (torch.randn, torch.rand, etc.)
+                        (isinstance(node.func, ast.Attribute) and
+                         isinstance(node.func.value, ast.Name) and
+                         node.func.value.id == 'torch' and
+                         func_name in ['randn', 'rand', 'randint', 'normal', 'uniform']) or
                         # sklearn functions that respect numpy global seed
                         func_name in ['shuffle', 'sample'] or
                         # direct numpy random calls after 'from numpy import random'
@@ -946,11 +998,20 @@ class ReproducibilityChecker:
             if isinstance(node, ast.Call):
                 # Check for np.random.seed(), random.seed(), torch.manual_seed()
                 if isinstance(node.func, ast.Attribute):
+                    # np.random.seed() pattern
                     if (node.func.attr == 'seed' and
                         isinstance(node.func.value, ast.Attribute) and
                         node.func.value.attr == 'random'):
                         return True
-                    elif node.func.attr in ['manual_seed', 'seed']:
+                    # torch.manual_seed() pattern
+                    elif (node.func.attr == 'manual_seed' and
+                          isinstance(node.func.value, ast.Name) and
+                          node.func.value.id == 'torch'):
+                        return True
+                    # random.seed() pattern
+                    elif (node.func.attr == 'seed' and
+                          isinstance(node.func.value, ast.Name) and
+                          node.func.value.id == 'random'):
                         return True
         return False
 

@@ -1,0 +1,124 @@
+{
+  "metrics": {
+    "accuracy_percent": 12.5,
+    "false_positive_rate_percent": 50.0,
+    "false_negative_rate_percent": 37.5,
+    "total_tests": 8,
+    "passed_tests": 1,
+    "failed_tests": 7,
+    "avg_analysis_time_ms": 3.827870000122857,
+    "max_analysis_time_ms": 9.659917000135465,
+    "true_positives": 0,
+    "true_negatives": 1,
+    "false_positives": 4,
+    "false_negatives": 3
+  },
+  "results": [
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/clean_code/clean_preprocessing.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 1,
+      "actual_types": [
+        "magic_hyperparameter"
+      ],
+      "success": false,
+      "analysis_time_ms": 9.659917000135465
+    },
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/clean_code/clean_reproducibility.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 2,
+      "actual_types": [
+        "magic_hyperparameter",
+        "magic_hyperparameter"
+      ],
+      "success": false,
+      "analysis_time_ms": 3.1984170000214363
+    },
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/clean_code/clean_gpu_usage.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 8,
+      "actual_types": [
+        "magic_hyperparameter",
+        "magic_hyperparameter",
+        "magic_hyperparameter",
+        "magic_dimension",
+        "magic_dimension",
+        "gpu_memory_leak",
+        "missing_random_seed",
+        "missing_random_seed"
+      ],
+      "success": false,
+      "analysis_time_ms": 5.688917000043148
+    },
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/problematic_code/data_leakage_preprocessing.py",
+      "expected_errors": 1,
+      "expected_types": [
+        "data_leakage_preprocessing"
+      ],
+      "actual_errors": 2,
+      "actual_types": [
+        "magic_hyperparameter",
+        "data_leakage_preprocessing"
+      ],
+      "success": false,
+      "analysis_time_ms": 2.5396670002919564
+    },
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/problematic_code/missing_random_state.py",
+      "expected_errors": 1,
+      "expected_types": [
+        "missing_random_seed"
+      ],
+      "actual_errors": 2,
+      "actual_types": [
+        "magic_hyperparameter",
+        "missing_random_seed"
+      ],
+      "success": false,
+      "analysis_time_ms": 2.1115419999659935
+    },
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/problematic_code/gpu_memory_leak.py",
+      "expected_errors": 1,
+      "expected_types": [
+        "gpu_memory_leak"
+      ],
+      "actual_errors": 4,
+      "actual_types": [
+        "magic_hyperparameter",
+        "gpu_memory_leak",
+        "missing_random_seed",
+        "missing_random_seed"
+      ],
+      "success": false,
+      "analysis_time_ms": 2.557291000357509
+    },
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/edge_cases/global_seed_set.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 1,
+      "actual_types": [
+        "missing_random_seed"
+      ],
+      "success": false,
+      "analysis_time_ms": 1.9589590001487522
+    },
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/edge_cases/contextual_fixes.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 0,
+      "actual_types": [],
+      "success": true,
+      "analysis_time_ms": 2.9082500000185973
+    }
+  ],
+  "total_time_seconds": 0.03081798553466797
+}

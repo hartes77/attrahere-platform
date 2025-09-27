@@ -1,0 +1,135 @@
+{
+  "metrics": {
+    "accuracy_percent": 0.0,
+    "false_positive_rate_percent": 62.5,
+    "false_negative_rate_percent": 37.5,
+    "total_tests": 8,
+    "passed_tests": 0,
+    "failed_tests": 8,
+    "avg_analysis_time_ms": 4.434515499838199,
+    "max_analysis_time_ms": 9.791832999781036,
+    "true_positives": 0,
+    "true_negatives": 0,
+    "false_positives": 5,
+    "false_negatives": 3
+  },
+  "results": [
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/clean_code/clean_preprocessing.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 3,
+      "actual_types": [
+        "magic_hyperparameter",
+        "magic_hyperparameter",
+        "magic_hyperparameter"
+      ],
+      "success": false,
+      "analysis_time_ms": 9.791832999781036
+    },
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/clean_code/clean_reproducibility.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 5,
+      "actual_types": [
+        "magic_hyperparameter",
+        "magic_hyperparameter",
+        "magic_hyperparameter",
+        "magic_hyperparameter",
+        "magic_hyperparameter"
+      ],
+      "success": false,
+      "analysis_time_ms": 3.9921249999679276
+    },
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/clean_code/clean_gpu_usage.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 8,
+      "actual_types": [
+        "magic_hyperparameter",
+        "magic_hyperparameter",
+        "magic_hyperparameter",
+        "magic_dimension",
+        "magic_dimension",
+        "gpu_memory_leak",
+        "missing_random_seed",
+        "missing_random_seed"
+      ],
+      "success": false,
+      "analysis_time_ms": 7.3419999998805
+    },
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/problematic_code/data_leakage_preprocessing.py",
+      "expected_errors": 1,
+      "expected_types": [
+        "data_leakage_preprocessing"
+      ],
+      "actual_errors": 4,
+      "actual_types": [
+        "magic_hyperparameter",
+        "magic_hyperparameter",
+        "magic_hyperparameter",
+        "data_leakage_preprocessing"
+      ],
+      "success": false,
+      "analysis_time_ms": 3.0025409996596863
+    },
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/problematic_code/missing_random_state.py",
+      "expected_errors": 1,
+      "expected_types": [
+        "missing_random_seed"
+      ],
+      "actual_errors": 3,
+      "actual_types": [
+        "magic_hyperparameter",
+        "magic_hyperparameter",
+        "missing_random_seed"
+      ],
+      "success": false,
+      "analysis_time_ms": 2.2215839999262244
+    },
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/problematic_code/gpu_memory_leak.py",
+      "expected_errors": 1,
+      "expected_types": [
+        "gpu_memory_leak"
+      ],
+      "actual_errors": 4,
+      "actual_types": [
+        "magic_hyperparameter",
+        "gpu_memory_leak",
+        "missing_random_seed",
+        "missing_random_seed"
+      ],
+      "success": false,
+      "analysis_time_ms": 3.15341699979399
+    },
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/edge_cases/global_seed_set.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 1,
+      "actual_types": [
+        "missing_random_seed"
+      ],
+      "success": false,
+      "analysis_time_ms": 2.6133329997719557
+    },
+    {
+      "file_path": "/Users/rossellacarraro/attrahere-infrastructure/attrahere-platform/tests/edge_cases/contextual_fixes.py",
+      "expected_errors": 0,
+      "expected_types": [],
+      "actual_errors": 2,
+      "actual_types": [
+        "magic_hyperparameter",
+        "magic_hyperparameter"
+      ],
+      "success": false,
+      "analysis_time_ms": 3.3592909999242693
+    }
+  ],
+  "total_time_seconds": 0.03585934638977051
+}
