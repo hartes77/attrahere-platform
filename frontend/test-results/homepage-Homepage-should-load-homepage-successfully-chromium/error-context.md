@@ -1,0 +1,352 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+    - generic [ref=e6] [cursor=pointer]:
+        - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+            - img [ref=e8] [cursor=pointer]
+        - generic [ref=e11] [cursor=pointer]:
+            - button "Open issues overlay" [ref=e12] [cursor=pointer]:
+                - generic [ref=e13] [cursor=pointer]:
+                    - generic [ref=e14] [cursor=pointer]: '0'
+                    - generic [ref=e15] [cursor=pointer]: '1'
+                - generic [ref=e16] [cursor=pointer]: Issue
+            - button "Collapse issues badge" [ref=e17] [cursor=pointer]:
+                - img [ref=e18] [cursor=pointer]
+    - link "Skip to main content" [ref=e20] [cursor=pointer]:
+        - /url: '#main-content'
+    - main [ref=e21]:
+        - generic [ref=e22]:
+            - complementary [ref=e23]:
+                - generic [ref=e24]:
+                    - img [ref=e26]
+                    - heading "ML Quality" [level=1] [ref=e30]
+                - navigation [ref=e31]:
+                    - link "Dashboard" [ref=e32] [cursor=pointer]:
+                        - /url: '#'
+                        - img [ref=e33] [cursor=pointer]
+                        - generic [ref=e35] [cursor=pointer]: Dashboard
+                    - link "Analyze" [ref=e36] [cursor=pointer]:
+                        - /url: /analyze
+                        - img [ref=e37] [cursor=pointer]
+                        - generic [ref=e41] [cursor=pointer]: Analyze
+                    - link "Patterns" [ref=e42] [cursor=pointer]:
+                        - /url: '#'
+                        - img [ref=e43] [cursor=pointer]
+                        - generic [ref=e46] [cursor=pointer]: Patterns
+                    - link "Settings" [ref=e47] [cursor=pointer]:
+                        - /url: '#'
+                        - img [ref=e48] [cursor=pointer]
+                        - generic [ref=e51] [cursor=pointer]: Settings
+                - generic [ref=e52]:
+                    - generic [ref=e53]: Quick Stats
+                    - generic [ref=e54]:
+                        - generic [ref=e55]:
+                            - generic [ref=e56]: Active Users
+                            - generic [ref=e57]: '156'
+                        - generic [ref=e58]:
+                            - generic [ref=e59]: Success Rate
+                            - generic [ref=e60]: 94.3%
+                        - generic [ref=e61]:
+                            - generic [ref=e62]: Avg Time
+                            - generic [ref=e63]: 23.5s
+            - main [ref=e64]:
+                - generic [ref=e65]:
+                    - generic [ref=e66]:
+                        - heading "ML Code Quality Dashboard" [level=1] [ref=e67]
+                        - paragraph [ref=e68]: Monitor your ML code analysis metrics and patterns
+                    - link "Analyze Code" [ref=e69] [cursor=pointer]:
+                        - /url: /analyze
+                        - button "Analyze Code" [ref=e70]:
+                            - img [ref=e71]
+                            - text: Analyze Code
+                            - img [ref=e73]
+                - generic [ref=e75]:
+                    - generic [ref=e78]:
+                        - generic [ref=e79]:
+                            - paragraph [ref=e80]: Total Analyses
+                            - paragraph [ref=e81]: 1,247
+                        - img [ref=e82]
+                    - generic [ref=e86]:
+                        - generic [ref=e87]:
+                            - paragraph [ref=e88]: Success Rate
+                            - paragraph [ref=e89]: 94.3%
+                        - img [ref=e90]
+                    - generic [ref=e95]:
+                        - generic [ref=e96]:
+                            - paragraph [ref=e97]: Avg Analysis Time
+                            - paragraph [ref=e98]: 23.5s
+                        - img [ref=e99]
+                    - generic [ref=e104]:
+                        - generic [ref=e105]:
+                            - paragraph [ref=e106]: Top Pattern
+                            - paragraph [ref=e107]: Data Leakage
+                        - img [ref=e108]
+                - generic [ref=e110]:
+                    - generic [ref=e111]:
+                        - generic [ref=e112]:
+                            - heading "Most Frequent Patterns" [level=3] [ref=e113]
+                            - paragraph [ref=e114]: Top ML anti-patterns detected this week
+                        - generic [ref=e116]:
+                            - generic [ref=e118]:
+                                - generic [ref=e119]: '1'
+                                - generic [ref=e120]:
+                                    - paragraph [ref=e121]: Data Leakage
+                                    - paragraph [ref=e122]: 89 occurrences (35.6%)
+                            - generic [ref=e124]:
+                                - generic [ref=e125]: '2'
+                                - generic [ref=e126]:
+                                    - paragraph [ref=e127]: Magic Numbers
+                                    - paragraph [ref=e128]: 67 occurrences (26.8%)
+                            - generic [ref=e130]:
+                                - generic [ref=e131]: '3'
+                                - generic [ref=e132]:
+                                    - paragraph [ref=e133]: Reproducibility
+                                    - paragraph [ref=e134]: 45 occurrences (18%)
+                            - generic [ref=e136]:
+                                - generic [ref=e137]: '4'
+                                - generic [ref=e138]:
+                                    - paragraph [ref=e139]: Gpu Memory
+                                    - paragraph [ref=e140]: 23 occurrences (9.2%)
+                            - generic [ref=e142]:
+                                - generic [ref=e143]: '5'
+                                - generic [ref=e144]:
+                                    - paragraph [ref=e145]: Model Architecture
+                                    - paragraph [ref=e146]: 26 occurrences (10.4%)
+                    - generic [ref=e147]:
+                        - generic [ref=e148]:
+                            - heading "Issue Severity Distribution" [level=3] [ref=e149]
+                            - paragraph [ref=e150]: Breakdown of detected issues by severity
+                        - generic [ref=e152]:
+                            - generic [ref=e153]:
+                                - generic [ref=e155]: critical
+                                - generic [ref=e156]: '12'
+                            - generic [ref=e157]:
+                                - generic [ref=e159]: high
+                                - generic [ref=e160]: '34'
+                            - generic [ref=e161]:
+                                - generic [ref=e163]: medium
+                                - generic [ref=e164]: '78'
+                            - generic [ref=e165]:
+                                - generic [ref=e167]: low
+                                - generic [ref=e168]: '123'
+                - generic [ref=e169]:
+                    - generic [ref=e170]:
+                        - heading "Recent Pattern Detections" [level=2] [ref=e171]
+                        - button "View All" [ref=e172]:
+                            - text: View All
+                            - img [ref=e173]
+                    - generic [ref=e175]:
+                        - generic [ref=e176]:
+                            - generic [ref=e178]:
+                                - generic [ref=e179]:
+                                    - generic [ref=e180]:
+                                        - img [ref=e181]
+                                        - generic [ref=e185]: 🔄
+                                    - generic [ref=e186]:
+                                        - heading "data leakage" [level=3] [ref=e187]
+                                        - paragraph [ref=e188]: model_training.py:15
+                                - generic [ref=e189]:
+                                    - generic [ref=e190]: critical
+                                    - generic [ref=e191]: 95% confidence
+                            - generic [ref=e192]:
+                                - paragraph [ref=e193]: 'Data leakage detected: preprocessing before train/test split'
+                                - generic [ref=e195]:
+                                    - img [ref=e196]
+                                    - paragraph [ref=e198]: The StandardScaler is fitted on the entire dataset before splitting, causing data leakage. This leads to overly optimistic performance metrics.
+                                - generic [ref=e199]:
+                                    - generic [ref=e200]:
+                                        - generic [ref=e201]:
+                                            - img [ref=e202]
+                                            - generic [ref=e206]: Code Context
+                                        - button [ref=e207]:
+                                            - img [ref=e208]
+                                    - generic [ref=e211]: scaler = StandardScaler() X_scaled = scaler.fit_transform(X) X_train, X_test = train_test_split(X_scaled, y)
+                                - generic [ref=e213]:
+                                    - img [ref=e214]
+                                    - generic [ref=e217]:
+                                        - paragraph [ref=e218]: 'Suggested Fix:'
+                                        - paragraph [ref=e219]: Move preprocessing after train/test split or use Pipeline
+                            - generic [ref=e220]:
+                                - generic [ref=e221]:
+                                    - button [ref=e222]:
+                                        - img [ref=e223]
+                                    - button [ref=e225]:
+                                        - img [ref=e226]
+                                    - button "Wrong" [ref=e228]
+                                - generic [ref=e229]:
+                                    - button "Apply Fix" [ref=e230]
+                                    - button [ref=e231]:
+                                        - img [ref=e232]
+                        - generic [ref=e236]:
+                            - generic [ref=e238]:
+                                - generic [ref=e239]:
+                                    - generic [ref=e240]:
+                                        - img [ref=e241]
+                                        - generic [ref=e243]: 🔢
+                                    - generic [ref=e244]:
+                                        - heading "magic numbers" [level=3] [ref=e245]
+                                        - paragraph [ref=e246]: neural_network.py:23
+                                - generic [ref=e247]:
+                                    - generic [ref=e248]: medium
+                                    - generic [ref=e249]: 88% confidence
+                            - generic [ref=e250]:
+                                - paragraph [ref=e251]: Magic number detected in model configuration
+                                - generic [ref=e253]:
+                                    - img [ref=e254]
+                                    - paragraph [ref=e256]: Hard-coded values like 0.001 for learning rate should be configurable parameters.
+                                - generic [ref=e257]:
+                                    - generic [ref=e258]:
+                                        - generic [ref=e259]:
+                                            - img [ref=e260]
+                                            - generic [ref=e264]: Code Context
+                                        - button [ref=e265]:
+                                            - img [ref=e266]
+                                    - generic [ref=e269]: optimizer = Adam(learning_rate=0.001)
+                                - generic [ref=e271]:
+                                    - img [ref=e272]
+                                    - generic [ref=e275]:
+                                        - paragraph [ref=e276]: 'Suggested Fix:'
+                                        - paragraph [ref=e277]: 'Define as named constant: LEARNING_RATE = 0.001'
+                            - generic [ref=e278]:
+                                - generic [ref=e279]:
+                                    - button [ref=e280]:
+                                        - img [ref=e281]
+                                    - button [ref=e283]:
+                                        - img [ref=e284]
+                                    - button "Wrong" [ref=e286]
+                                - generic [ref=e287]:
+                                    - button "Apply Fix" [ref=e288]
+                                    - button [ref=e289]:
+                                        - img [ref=e290]
+                        - generic [ref=e294]:
+                            - generic [ref=e296]:
+                                - generic [ref=e297]:
+                                    - generic [ref=e298]:
+                                        - img [ref=e299]
+                                        - generic [ref=e301]: 🎯
+                                    - generic [ref=e302]:
+                                        - heading "reproducibility" [level=3] [ref=e303]
+                                        - paragraph [ref=e304]: experiment.py:8
+                                - generic [ref=e305]:
+                                    - generic [ref=e306]: high
+                                    - generic [ref=e307]: 92% confidence
+                            - generic [ref=e308]:
+                                - paragraph [ref=e309]: Missing random seed for reproducibility
+                                - generic [ref=e311]:
+                                    - img [ref=e312]
+                                    - paragraph [ref=e314]: Without setting random seeds, results won't be reproducible across runs.
+                                - generic [ref=e315]:
+                                    - generic [ref=e316]:
+                                        - generic [ref=e317]:
+                                            - img [ref=e318]
+                                            - generic [ref=e322]: Code Context
+                                        - button [ref=e323]:
+                                            - img [ref=e324]
+                                    - generic [ref=e327]: X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+                                - generic [ref=e329]:
+                                    - img [ref=e330]
+                                    - generic [ref=e333]:
+                                        - paragraph [ref=e334]: 'Suggested Fix:'
+                                        - paragraph [ref=e335]: 'Add: np.random.seed(42), tf.random.set_seed(42)'
+                            - generic [ref=e336]:
+                                - generic [ref=e337]:
+                                    - button [ref=e338]:
+                                        - img [ref=e339]
+                                    - button [ref=e341]:
+                                        - img [ref=e342]
+                                    - button "Wrong" [ref=e344]
+                                - generic [ref=e345]:
+                                    - button "Apply Fix" [ref=e346]
+                                    - button [ref=e347]:
+                                        - img [ref=e348]
+                        - generic [ref=e352]:
+                            - generic [ref=e354]:
+                                - generic [ref=e355]:
+                                    - generic [ref=e356]:
+                                        - img [ref=e357]
+                                        - generic [ref=e359]: 💾
+                                    - generic [ref=e360]:
+                                        - heading "gpu memory" [level=3] [ref=e361]
+                                        - paragraph [ref=e362]: deep_learning.py:45
+                                - generic [ref=e363]:
+                                    - generic [ref=e364]: medium
+                                    - generic [ref=e365]: 78% confidence
+                            - generic [ref=e366]:
+                                - paragraph [ref=e367]: Potential GPU memory leak in training loop
+                                - generic [ref=e369]:
+                                    - img [ref=e370]
+                                    - paragraph [ref=e372]: Large tensors created in loop without proper cleanup may cause memory issues.
+                                - generic [ref=e373]:
+                                    - generic [ref=e374]:
+                                        - generic [ref=e375]:
+                                            - img [ref=e376]
+                                            - generic [ref=e380]: Code Context
+                                        - button [ref=e381]:
+                                            - img [ref=e382]
+                                    - generic [ref=e385]: 'for batch in dataloader: predictions = model(batch) loss = criterion(predictions, targets)'
+                                - generic [ref=e387]:
+                                    - img [ref=e388]
+                                    - generic [ref=e391]:
+                                        - paragraph [ref=e392]: 'Suggested Fix:'
+                                        - paragraph [ref=e393]: Add torch.cuda.empty_cache() or use context managers
+                            - generic [ref=e394]:
+                                - generic [ref=e395]:
+                                    - button [ref=e396]:
+                                        - img [ref=e397]
+                                    - button [ref=e399]:
+                                        - img [ref=e400]
+                                    - button "Wrong" [ref=e402]
+                                - generic [ref=e403]:
+                                    - button "Apply Fix" [ref=e404]
+                                    - button [ref=e405]:
+                                        - img [ref=e406]
+                - generic [ref=e410]:
+                    - generic [ref=e411]:
+                        - heading "Weekly Analysis Activity" [level=3] [ref=e412]
+                        - paragraph [ref=e413]: Analysis volume and patterns detected over the past 7 days
+                    - generic [ref=e415]:
+                        - generic [ref=e416]:
+                            - generic [ref=e417]: Mon
+                            - generic [ref=e418]:
+                                - generic [ref=e419]: '45'
+                                - generic [ref=e420]: analyses
+                                - generic [ref=e421]: 12 patterns
+                        - generic [ref=e422]:
+                            - generic [ref=e423]: Tue
+                            - generic [ref=e424]:
+                                - generic [ref=e425]: '52'
+                                - generic [ref=e426]: analyses
+                                - generic [ref=e427]: 18 patterns
+                        - generic [ref=e428]:
+                            - generic [ref=e429]: Wed
+                            - generic [ref=e430]:
+                                - generic [ref=e431]: '38'
+                                - generic [ref=e432]: analyses
+                                - generic [ref=e433]: 9 patterns
+                        - generic [ref=e434]:
+                            - generic [ref=e435]: Thu
+                            - generic [ref=e436]:
+                                - generic [ref=e437]: '61'
+                                - generic [ref=e438]: analyses
+                                - generic [ref=e439]: 23 patterns
+                        - generic [ref=e440]:
+                            - generic [ref=e441]: Fri
+                            - generic [ref=e442]:
+                                - generic [ref=e443]: '43'
+                                - generic [ref=e444]: analyses
+                                - generic [ref=e445]: 15 patterns
+                        - generic [ref=e446]:
+                            - generic [ref=e447]: Sat
+                            - generic [ref=e448]:
+                                - generic [ref=e449]: '29'
+                                - generic [ref=e450]: analyses
+                                - generic [ref=e451]: 8 patterns
+                        - generic [ref=e452]:
+                            - generic [ref=e453]: Sun
+                            - generic [ref=e454]:
+                                - generic [ref=e455]: '31'
+                                - generic [ref=e456]: analyses
+                                - generic [ref=e457]: 11 patterns
+    - alert [ref=e458]
+```

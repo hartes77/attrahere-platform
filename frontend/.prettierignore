@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Production builds
+.next/
+out/
+build/
+dist/
+
+# Package files
+package-lock.json
+yarn.lock
+
+# Environment files
+.env*
+
+# Generated files
+*.d.ts
+*.generated.*
+
+# Cache directories
+.turbo/
+.cache/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
