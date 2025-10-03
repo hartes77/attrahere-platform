@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attrahere - Emergency Landing</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Inter, sans-serif; background: #0F172A; color: #fff; margin: 0; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .hero { text-align: center; margin-bottom: 60px; }
+        h1 { font-size: 4rem; background: linear-gradient(to right, #0EA5E9, #3B82F6); -webkit-background-clip: text; color: transparent; }
+        h2 { font-size: 2.5rem; color: #E2E8F0; margin-bottom: 20px; }
+        .highlight { color: #0EA5E9; }
+        p { font-size: 1.25rem; color: #CBD5E1; line-height: 1.6; margin-bottom: 30px; }
+        .card { background: #1E293B; padding: 30px; border-radius: 12px; margin: 20px 0; }
+        .btn { background: linear-gradient(to right, #8B5CF6, #3B82F6); color: white; padding: 16px 40px; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; text-decoration: none; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1>Attrahere</h1>
+            <h2>Rilascia <span class="highlight">Modelli ML</span>, non Bug Critici.</h2>
+            <p>Attrahere è la piattaforma di analisi del codice <strong>specializzata per il ciclo di vita MLOps</strong>.
+            Rileva e aiuta a risolvere gli anti-pattern più costosi e invisibili ai tool generici —
+            dal data leakage ai GPU memory leaks — prima che il tuo codice raggiunga la produzione.</p>
+            <a href="mailto:info@attrahere.com" class="btn">Richiedi Demo Tecnica</a>
+        </div>
+
+        <div class="card">
+            <h3 style="color: #EF4444;">Data & Target Leakage</h3>
+            <h4>Modelli Inaffidabili, Risorse Sprecate</h4>
+            <p>Rileva automaticamente 3 tipi di leakage critici (Data, Time Series, Target).
+            Evita che il tuo team sprechi settimane di training e costi computazionali su modelli invalidati alla fonte.</p>
+        </div>
+
+        <div class="card">
+            <h3 style="color: #F59E0B;">GPU/CPU Memory Leaks</h3>
+            <h4>Training che Falliscono, Debug Infinito</h4>
+            <p>Identifica la gestione inefficiente della memoria in PyTorch e TensorFlow,
+            come gradienti accumulati o tensori non deallocati, che causano crash imprevedibili e ore di debugging.</p>
+        </div>
+
+        <div class="card">
+            <h3 style="color: #22C55E;">Case Study: Real-World Analysis Results</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 20px 0;">
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; color: #F59E0B;">1.7s</div>
+                    <div>Analysis Completion</div>
+                    <small>50 Python files</small>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; color: #22C55E;">39</div>
+                    <div>Issues Detected</div>
+                    <small>26 Critical, 13 Medium</small>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; color: #0EA5E9;">95%</div>
+                    <div>Precision Rate</div>
+                    <small>87.7% Avg Confidence</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="text-align: center;">
+            <h2>Pronto per <span class="highlight">Codice ML</span> Production-Ready?</h2>
+            <p>Non lasciare che data leakage e GPU memory leaks sabotino i tuoi deployment.
+            Attrahere rileva gli anti-pattern <strong>prima che costino tempo e denaro</strong>.</p>
+            <a href="mailto:info@attrahere.com" class="btn">Richiedi Demo Tecnica</a>
+        </div>
+    </div>
+</body>
+</html>

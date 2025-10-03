@@ -1,0 +1,27 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="32" height="32" fill="white" rx="6"/>
+
+  <!-- Attrahere Logo - Letter A with network nodes -->
+  <g transform="translate(4, 4) scale(0.24)">
+    <!-- Main A letter shape -->
+    <path
+      d="M25 75 L40 35 L60 35 L75 75 M35 60 L65 60"
+      stroke="#1e293b"
+      strokeWidth="8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+
+    <!-- Green node (top right) -->
+    <circle cx="65" cy="25" r="8" fill="#22c55e" />
+
+    <!-- Blue node (middle right) -->
+    <circle cx="75" cy="45" r="6" fill="#3b82f6" />
+
+    <!-- Connection lines -->
+    <line x1="60" y1="35" x2="65" y2="25" stroke="#64748b" strokeWidth="2" />
+    <line x1="65" y1="60" x2="75" y2="45" stroke="#64748b" strokeWidth="2" />
+  </g>
+</svg>
