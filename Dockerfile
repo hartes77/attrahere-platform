@@ -1,16 +1,16 @@
-# Multi-stage build for production optimization
+# Multi-stage build for Attrahere ML Code Analysis Platform
 FROM python:3.11-slim as base
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHONPATH="/app" \
-    PORT=8000
+    PYTHONPATH="/app"
 
 # Install system dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         build-essential \
+        git \
         curl \
     && rm -rf /var/lib/apt/lists/*
 
@@ -29,15 +29,21 @@ COPY . .
 
 # Create non-root user for security
 RUN groupadd -r appuser && useradd -r -g appuser appuser \
-    && chown -R appuser:appuser /app
+    && chown -R appuser:appuser /app \
+    && chmod +x /app/generate_report.py
+
 USER appuser
 
-# Expose port
-EXPOSE $PORT
+# Create volume mount point for code analysis
+VOLUME ["/workspace"]
 
-# Health check
+# Set working directory for analysis
+WORKDIR /workspace
+
+# Default command runs the CLI analyzer
+# Usage: docker run -v $(pwd):/workspace attrahere-image --target your_file.py
+ENTRYPOINT ["python", "/app/generate_report.py"]
+
+# Health check for CLI tool (checks if Python dependencies are working)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:$PORT/health || exit 1
-
-# Run the application
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    CMD python -c "import analysis_core.ml_analyzer.detectors; print('healthy')" || exit 1
