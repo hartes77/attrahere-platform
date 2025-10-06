@@ -1,0 +1,497 @@
+openapi: 3.0.3
+info:
+  title: Attrahere ML Code Analysis API
+  description: |
+    Enterprise-grade ML code analysis platform that detects anti-patterns and data leakage 
+    in machine learning codebases with surgical precision.
+    
+    **Key Capabilities:**
+    - Data Flow Contamination Detection (pipeline contamination, cv preprocessing leakage)
+    - Temporal Leakage Detection (negative shifts, centered rolling, global statistics)
+    - Multi-detector integration with unified reporting
+    - Runtime monitoring and execution metrics
+    - Zero false positives on clean code (surgical precision)
+    
+    **Enterprise Features:**
+    - Professional CLI reports with confidence scores
+    - Comprehensive pattern explanations and fix suggestions
+    - Industry references and best practices
+    - Production-ready analysis with detailed diagnostics
+  version: "1.0.0"
+  contact:
+    name: Attrahere Platform
+    email: support@attrahere.com
+  license:
+    name: Proprietary
+    url: https://attrahere.com/license
+
+servers:
+  - url: https://api.attrahere.com/v1
+    description: Production server
+  - url: https://staging-api.attrahere.com/v1
+    description: Staging server
+  - url: http://localhost:8000/v1
+    description: Local development server
+
+paths:
+  /analyze:
+    post:
+      summary: Analyze ML code for anti-patterns
+      description: |
+        Analyzes Python ML code to detect data leakage patterns, temporal issues, 
+        and other anti-patterns that can compromise model validity.
+        
+        **Detection Capabilities:**
+        - Pipeline contamination (preprocessing before train/test split)
+        - Cross-validation preprocessing contamination  
+        - Feature engineering leakage
+        - Temporal negative shifts (future data access)
+        - Centered rolling windows (look-ahead bias)
+        - Global temporal statistics
+        - Random splits on temporal data
+        
+        **Analysis Process:**
+        1. AST parsing and semantic analysis
+        2. Data lineage tracking for surgical precision
+        3. Multi-detector pattern recognition
+        4. Confidence scoring and validation
+        5. Professional report generation with fix suggestions
+      operationId: analyzeCode
+      tags:
+        - Analysis
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Python file containing ML code to analyze
+                options:
+                  type: object
+                  properties:
+                    include_monitoring:
+                      type: boolean
+                      default: false
+                      description: Include runtime monitoring metrics in analysis
+                    severity_filter:
+                      type: string
+                      enum: [LOW, MEDIUM, HIGH, CRITICAL]
+                      default: LOW
+                      description: Minimum severity level for reported patterns
+                    detectors:
+                      type: array
+                      items:
+                        type: string
+                        enum: [data_flow, temporal_leakage]
+                      default: [data_flow, temporal_leakage]
+                      description: Specific detectors to run
+                    format:
+                      type: string
+                      enum: [json, cli, summary]
+                      default: json
+                      description: Output format preference
+              required:
+                - file
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: Python code as string to analyze
+                filename:
+                  type: string
+                  default: "analysis.py"
+                  description: Filename for context in reports
+                options:
+                  $ref: '#/components/schemas/AnalysisOptions'
+              required:
+                - code
+      responses:
+        '200':
+          description: Analysis completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisResult'
+              examples:
+                clean_code:
+                  summary: Clean code with no patterns detected
+                  value:
+                    status: "success"
+                    analysis_id: "ana_1234567890abcdef"
+                    timestamp: "2024-03-15T10:30:00Z"
+                    file_info:
+                      filename: "clean_model.py"
+                      lines_of_code: 85
+                      functions_analyzed: 3
+                    execution_metrics:
+                      analysis_duration_ms: 245
+                      detectors_run: ["data_flow", "temporal_leakage"]
+                      patterns_detected: 0
+                    patterns: []
+                    summary:
+                      total_patterns: 0
+                      by_severity:
+                        HIGH: 0
+                        MEDIUM: 0
+                        LOW: 0
+                      by_detector:
+                        data_flow: 0
+                        temporal_leakage: 0
+                      confidence_score: 1.0
+                contaminated_code:
+                  summary: Code with detected anti-patterns
+                  value:
+                    status: "success"
+                    analysis_id: "ana_fedcba0987654321"
+                    timestamp: "2024-03-15T10:35:00Z"
+                    file_info:
+                      filename: "leaky_model.py"
+                      lines_of_code: 120
+                      functions_analyzed: 5
+                    execution_metrics:
+                      analysis_duration_ms: 380
+                      detectors_run: ["data_flow", "temporal_leakage"]
+                      patterns_detected: 3
+                    patterns:
+                      - pattern_id: "pat_001"
+                        type: "pipeline_contamination"
+                        severity: "HIGH"
+                        detector: "data_flow"
+                        line_number: 45
+                        message: "StandardScaler fit_transform applied before train/test split"
+                        explanation: "The preprocessing operation is applied to the entire dataset before splitting, causing data leakage where the model gains access to test set statistics during training."
+                        suggested_fix: "Apply preprocessing after train/test split or use Pipeline with cross-validation"
+                        confidence: 0.95
+                        fix_snippet: "# Correct approach:\nX_train, X_test, y_train, y_test = train_test_split(X, y)\nscaler = StandardScaler()\nX_train_scaled = scaler.fit_transform(X_train)\nX_test_scaled = scaler.transform(X_test)"
+                        references:
+                          - "https://scikit-learn.org/stable/modules/cross_validation.html#data-leakage"
+                      - pattern_id: "pat_002"
+                        type: "temporal_negative_shift"
+                        severity: "HIGH"
+                        detector: "temporal_leakage"
+                        line_number: 78
+                        message: "Negative shift operation (shift(-1)) accesses future data"
+                        explanation: "The shift operation with value -1 creates a feature using future data. This causes look-ahead bias where the model gains access to information that wouldn't be available at prediction time."
+                        confidence: 0.95
+                        fix_snippet: "# Correct approach - use only past data:\ndata['lag_feature'] = data['value'].shift(1)  # Past values only"
+                    summary:
+                      total_patterns: 3
+                      by_severity:
+                        HIGH: 2
+                        MEDIUM: 1
+                        LOW: 0
+                      by_detector:
+                        data_flow: 2
+                        temporal_leakage: 1
+                      confidence_score: 0.93
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_file:
+                  summary: Invalid Python file
+                  value:
+                    status: "error"
+                    error_code: "INVALID_FILE"
+                    message: "File is not valid Python code"
+                    details: "SyntaxError: invalid syntax (line 23)"
+                file_too_large:
+                  summary: File exceeds size limit
+                  value:
+                    status: "error"
+                    error_code: "FILE_TOO_LARGE"
+                    message: "File exceeds maximum size limit of 10MB"
+        '422':
+          description: Analysis failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                analysis_timeout:
+                  summary: Analysis timeout
+                  value:
+                    status: "error"
+                    error_code: "ANALYSIS_TIMEOUT"
+                    message: "Analysis exceeded maximum processing time"
+                    details: "Consider splitting large files or reducing complexity"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Returns the health status of the API service
+      operationId: healthCheck
+      tags:
+        - System
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+                  version:
+                    type: string
+                    example: "1.0.0"
+                  uptime_seconds:
+                    type: number
+                    example: 3600
+                  detectors_available:
+                    type: array
+                    items:
+                      type: string
+                    example: ["data_flow", "temporal_leakage"]
+
+components:
+  schemas:
+    AnalysisOptions:
+      type: object
+      properties:
+        include_monitoring:
+          type: boolean
+          default: false
+          description: Include runtime monitoring metrics
+        severity_filter:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, CRITICAL]
+          default: LOW
+          description: Minimum severity level for reported patterns
+        detectors:
+          type: array
+          items:
+            type: string
+            enum: [data_flow, temporal_leakage]
+          default: [data_flow, temporal_leakage]
+          description: Specific detectors to run
+        format:
+          type: string
+          enum: [json, cli, summary]
+          default: json
+          description: Output format preference
+
+    AnalysisResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success, error]
+          description: Overall analysis status
+        analysis_id:
+          type: string
+          description: Unique identifier for this analysis
+        timestamp:
+          type: string
+          format: date-time
+          description: When the analysis was performed
+        file_info:
+          $ref: '#/components/schemas/FileInfo'
+        execution_metrics:
+          $ref: '#/components/schemas/ExecutionMetrics'
+        patterns:
+          type: array
+          items:
+            $ref: '#/components/schemas/MLAntiPattern'
+          description: Detected anti-patterns
+        summary:
+          $ref: '#/components/schemas/AnalysisSummary'
+      required:
+        - status
+        - analysis_id
+        - timestamp
+        - patterns
+        - summary
+
+    FileInfo:
+      type: object
+      properties:
+        filename:
+          type: string
+          description: Name of the analyzed file
+        lines_of_code:
+          type: integer
+          description: Total lines of code analyzed
+        functions_analyzed:
+          type: integer
+          description: Number of functions analyzed
+        imports_detected:
+          type: array
+          items:
+            type: string
+          description: ML libraries detected in imports
+
+    ExecutionMetrics:
+      type: object
+      properties:
+        analysis_duration_ms:
+          type: number
+          description: Time taken for analysis in milliseconds
+        detectors_run:
+          type: array
+          items:
+            type: string
+          description: List of detectors that were executed
+        patterns_detected:
+          type: integer
+          description: Total number of patterns detected
+        memory_peak_mb:
+          type: number
+          description: Peak memory usage during analysis
+
+    MLAntiPattern:
+      type: object
+      properties:
+        pattern_id:
+          type: string
+          description: Unique identifier for this pattern instance
+        type:
+          type: string
+          description: Type of anti-pattern detected
+          enum:
+            - pipeline_contamination
+            - cv_preprocessing_contamination
+            - feature_engineering_leakage
+            - temporal_negative_shift
+            - temporal_centered_rolling
+            - temporal_global_statistics
+            - temporal_random_split
+        severity:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, CRITICAL]
+          description: Severity level of the pattern
+        detector:
+          type: string
+          description: Which detector found this pattern
+        line_number:
+          type: integer
+          description: Line number where pattern was detected
+        column_number:
+          type: integer
+          description: Column number where pattern starts
+        message:
+          type: string
+          description: Brief description of the issue
+        explanation:
+          type: string
+          description: Detailed explanation of why this is problematic
+        suggested_fix:
+          type: string
+          description: Recommended solution
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Confidence score for this detection (0-1)
+        fix_snippet:
+          type: string
+          description: Code example showing the correct approach
+        references:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: Links to relevant documentation and best practices
+      required:
+        - pattern_id
+        - type
+        - severity
+        - detector
+        - line_number
+        - message
+        - confidence
+
+    AnalysisSummary:
+      type: object
+      properties:
+        total_patterns:
+          type: integer
+          description: Total number of patterns detected
+        by_severity:
+          type: object
+          properties:
+            HIGH:
+              type: integer
+            MEDIUM:
+              type: integer
+            LOW:
+              type: integer
+            CRITICAL:
+              type: integer
+          description: Pattern count by severity level
+        by_detector:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Pattern count by detector
+        confidence_score:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Overall confidence in the analysis results
+        risk_assessment:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, CRITICAL]
+          description: Overall risk level based on detected patterns
+      required:
+        - total_patterns
+        - by_severity
+        - by_detector
+        - confidence_score
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [error]
+        error_code:
+          type: string
+          description: Specific error code for programmatic handling
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: string
+          description: Additional error details
+        timestamp:
+          type: string
+          format: date-time
+          description: When the error occurred
+      required:
+        - status
+        - error_code
+        - message
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for API authentication
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Analysis
+    description: ML code analysis operations
+  - name: System
+    description: System health and status endpoints

@@ -10,10 +10,31 @@ import inspect
 from dataclasses import dataclass
 from typing import Dict, List, Any, Optional, Set, Union
 from pathlib import Path
+from enum import Enum
 
 import libcst as cst
 from libcst import matchers as m
 from libcst.metadata import PositionProvider, ScopeProvider
+
+
+class DatasetType(Enum):
+    """Semantic classification of datasets in ML pipelines"""
+    FULL_TRAINING_SET = "full_training_set"
+    TRAINING_SUBSET = "training_subset"  
+    VALIDATION_SUBSET = "validation_subset"
+    UNSEEN_TEST_SET = "unseen_test_set"
+    MIXED_DATASET = "mixed_dataset"  # Train+test combined
+    UNKNOWN = "unknown"
+
+
+@dataclass
+class DataLineage:
+    """Enhanced data lineage with semantic understanding"""
+    variable_name: str
+    dataset_type: DatasetType
+    source_operations: List[str]  # Operations that created this data
+    contamination_risk: float  # 0.0 = safe, 1.0 = high leakage risk
+    context: str  # Function/scope where variable exists
 
 
 @dataclass
@@ -29,6 +50,7 @@ class ASTAnalysisResult:
     ml_constructs: Dict[str, Any]  # ML-specific constructs found
     data_flow: Dict[str, List[str]]  # Variable dependencies
     complexity_metrics: Dict[str, int]
+    data_lineage: Dict[str, DataLineage]  # Enhanced semantic data tracking
 
 
 class MLSemanticAnalyzer:
@@ -89,6 +111,7 @@ class MLSemanticAnalyzer:
         ml_constructs = self._identify_ml_constructs(ast_tree, imports)
         data_flow = self._analyze_data_flow(ast_tree)
         complexity_metrics = self._calculate_complexity(ast_tree)
+        data_lineage = self._analyze_data_lineage(ast_tree, variables, imports)
         
         return ASTAnalysisResult(
             file_path=str(file_path),
@@ -100,7 +123,8 @@ class MLSemanticAnalyzer:
             variables=variables,
             ml_constructs=ml_constructs,
             data_flow=data_flow,
-            complexity_metrics=complexity_metrics
+            complexity_metrics=complexity_metrics,
+            data_lineage=data_lineage
         )
     
     def _extract_imports(self, tree: ast.AST) -> Dict[str, str]:
@@ -280,6 +304,125 @@ class MLSemanticAnalyzer:
                 complexity['class_count'] += 1
         
         return complexity
+    
+    def _analyze_data_lineage(self, tree: ast.AST, variables: Dict[str, ast.Assign], imports: Dict[str, str]) -> Dict[str, DataLineage]:
+        """
+        Analyze data lineage with semantic understanding of dataset types
+        
+        This method classifies variables based on:
+        - Variable naming patterns (train_df, test_df, X_train, etc.)
+        - Source operations (pd.read_csv, train_test_split, etc.)
+        - Context (function scope, preprocessing steps)
+        """
+        data_lineage = {}
+        
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name):
+                        var_name = target.id
+                        dataset_type = self._classify_dataset_type(var_name, node)
+                        contamination_risk = self._calculate_contamination_risk(var_name, node, dataset_type)
+                        context = self._get_variable_context(node, tree)
+                        source_ops = self._extract_source_operations(node)
+                        
+                        data_lineage[var_name] = DataLineage(
+                            variable_name=var_name,
+                            dataset_type=dataset_type,
+                            source_operations=source_ops,
+                            contamination_risk=contamination_risk,
+                            context=context
+                        )
+        
+        return data_lineage
+    
+    def _classify_dataset_type(self, var_name: str, node: ast.Assign) -> DatasetType:
+        """Classify dataset type based on variable name and assignment patterns"""
+        
+        # Check naming conventions
+        var_lower = var_name.lower()
+        
+        if any(pattern in var_lower for pattern in ['train_df', 'training_data', 'train_set']):
+            return DatasetType.FULL_TRAINING_SET
+        
+        if any(pattern in var_lower for pattern in ['test_df', 'test_data', 'test_set']):
+            return DatasetType.UNSEEN_TEST_SET
+            
+        if any(pattern in var_lower for pattern in ['x_train', 'y_train']):
+            return DatasetType.TRAINING_SUBSET
+            
+        if any(pattern in var_lower for pattern in ['x_test', 'y_test', 'x_val', 'y_val']):
+            return DatasetType.VALIDATION_SUBSET
+            
+        # Check source operations for train_test_split
+        if self._comes_from_train_test_split(node):
+            if any(pattern in var_lower for pattern in ['train', 'tr']):
+                return DatasetType.TRAINING_SUBSET
+            elif any(pattern in var_lower for pattern in ['test', 'val']):
+                return DatasetType.VALIDATION_SUBSET
+                
+        # Check for mixed datasets (pd.concat, merge operations)
+        if self._comes_from_concat_operation(node):
+            return DatasetType.MIXED_DATASET
+            
+        return DatasetType.UNKNOWN
+    
+    def _calculate_contamination_risk(self, var_name: str, node: ast.Assign, dataset_type: DatasetType) -> float:
+        """Calculate contamination risk based on dataset type and operations"""
+        
+        if dataset_type == DatasetType.MIXED_DATASET:
+            return 1.0  # Highest risk
+        elif dataset_type == DatasetType.UNSEEN_TEST_SET:
+            return 0.8  # High risk if used in preprocessing
+        elif dataset_type == DatasetType.VALIDATION_SUBSET:
+            return 0.3  # Medium risk
+        elif dataset_type in [DatasetType.FULL_TRAINING_SET, DatasetType.TRAINING_SUBSET]:
+            return 0.1  # Low risk
+        else:
+            return 0.5  # Unknown, moderate risk
+    
+    def _extract_source_operations(self, node: ast.Assign) -> List[str]:
+        """Extract the operations that created this variable"""
+        operations = []
+        
+        if isinstance(node.value, ast.Call):
+            if isinstance(node.value.func, ast.Attribute):
+                operations.append(f"{node.value.func.attr}")
+            elif isinstance(node.value.func, ast.Name):
+                operations.append(f"{node.value.func.id}")
+                
+        return operations
+    
+    def _get_variable_context(self, node: ast.Assign, tree: ast.AST) -> str:
+        """Get the context (function/class) where variable is defined"""
+        
+        for parent in ast.walk(tree):
+            if isinstance(parent, ast.FunctionDef):
+                for child in ast.walk(parent):
+                    if child is node:
+                        return f"function:{parent.name}"
+            elif isinstance(parent, ast.ClassDef):
+                for child in ast.walk(parent):
+                    if child is node:
+                        return f"class:{parent.name}"
+        
+        return "global"
+    
+    def _comes_from_train_test_split(self, node: ast.Assign) -> bool:
+        """Check if variable comes from train_test_split"""
+        if isinstance(node.value, ast.Call):
+            if isinstance(node.value.func, ast.Name):
+                return node.value.func.id == 'train_test_split'
+            elif isinstance(node.value.func, ast.Attribute):
+                return node.value.func.attr == 'train_test_split'
+        return False
+    
+    def _comes_from_concat_operation(self, node: ast.Assign) -> bool:
+        """Check if variable comes from concatenation operations"""
+        if isinstance(node.value, ast.Call):
+            if isinstance(node.value.func, ast.Attribute):
+                return node.value.func.attr in ['concat', 'merge', 'join']
+        return False
     
     def extract_pure_functions(self, tree: ast.AST) -> List[Dict[str, Any]]:
         """
