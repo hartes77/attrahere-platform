@@ -16,6 +16,7 @@ This script transforms detection results into formatted CLI output with:
 import sys
 import subprocess
 import json
+import os
 from pathlib import Path
 from datetime import datetime
 from rich.console import Console
@@ -113,71 +114,115 @@ def execute_with_monitoring(target_file):
         return {}
 
 
-def run_full_analysis(target_file, context):
+def find_python_files(directory):
+    """
+    Recursively find all Python files in a directory
+    
+    Args:
+        directory (str): Directory path to search
+        
+    Returns:
+        list: List of Python file paths
+    """
+    python_files = []
+    for root, dirs, files in os.walk(directory):
+        # Skip common non-code directories
+        dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['__pycache__', 'node_modules', 'venv', 'env']]
+        
+        for file in files:
+            if file.endswith('.py') and not file.startswith('.'):
+                python_files.append(os.path.join(root, file))
+    
+    return python_files
+
+
+def run_full_analysis(target_path, context):
     """
     Orchestrate complete analysis: static detection + runtime monitoring
 
     Args:
-        target_file (str): Path to Python file to analyze
+        target_path (str): Path to Python file or directory to analyze
 
     Returns:
-        tuple: (patterns_list, monitor_logs_dict)
+        tuple: (patterns_list, monitor_logs_dict, files_analyzed)
     """
     console = Console()
-    console.print(f"🔍 Analyzing: {target_file}", style="bold blue")
+    
+    # Determine if target is file or directory
+    if os.path.isfile(target_path):
+        target_files = [target_path]
+        console.print(f"🔍 Analyzing single file: {target_path}", style="bold blue")
+    elif os.path.isdir(target_path):
+        target_files = find_python_files(target_path)
+        console.print(f"🔍 Analyzing directory: {target_path}", style="bold blue")
+        console.print(f"📁 Found {len(target_files)} Python files", style="dim")
+    else:
+        console.print(f"❌ Target not found: {target_path}", style="bold red")
+        return [], {}, 0
+
+    # Initialize detectors once
+    semantic_analyzer = MLSemanticAnalyzer()
+    dataflow_detector = DataFlowContaminationDetector()
+    temporal_detector = TemporalLeakageDetector(analysis_context=context)
+    magic_detector = MagicNumberExtractor()
+    preprocessing_detector = PreprocessingLeakageDetector()
+    
+    all_patterns = []
+    all_monitor_logs = {}
+    files_analyzed = 0
 
     try:
-        # Initialize ML analyzer and detectors
-        semantic_analyzer = MLSemanticAnalyzer()
-        dataflow_detector = DataFlowContaminationDetector()
-        temporal_detector = TemporalLeakageDetector(analysis_context=context)
-        magic_detector = MagicNumberExtractor()
-        preprocessing_detector = PreprocessingLeakageDetector()
+        for target_file in target_files:
+            try:
+                console.print(f"  📄 Processing: {os.path.basename(target_file)}", style="dim")
+                
+                # Run static analysis
+                analysis_result = semantic_analyzer.analyze_file(Path(target_file))
 
-        # Run static analysis
-        console.print("📊 Running static analysis...", style="dim")
-        analysis_result = semantic_analyzer.analyze_file(Path(target_file))
+                # Run all detectors
+                dataflow_patterns = dataflow_detector.detect_patterns(analysis_result)
+                temporal_patterns = temporal_detector.detect_patterns(analysis_result)
+                magic_patterns = magic_detector.detect_patterns(analysis_result)
+                preprocessing_patterns = preprocessing_detector.detect_patterns(analysis_result)
 
-        # Run all detectors
-        console.print("🔍 DataFlow contamination detection...", style="dim")
-        dataflow_patterns = dataflow_detector.detect_patterns(analysis_result)
+                # Combine patterns from all detectors
+                file_patterns = dataflow_patterns + temporal_patterns + magic_patterns + preprocessing_patterns
+                
+                # Add file info to patterns
+                for pattern in file_patterns:
+                    pattern.file_path = target_file
+                
+                all_patterns.extend(file_patterns)
+                files_analyzed += 1
+                
+                if file_patterns:
+                    console.print(f"    🚨 Found {len(file_patterns)} patterns", style="yellow")
 
-        console.print("⏱️ Temporal leakage detection...", style="dim")
-        temporal_patterns = temporal_detector.detect_patterns(analysis_result)
-        
-        console.print("🔢 Magic number detection...", style="dim")
-        magic_patterns = magic_detector.detect_patterns(analysis_result)
-        
-        console.print("⚗️ Preprocessing leakage detection...", style="dim")
-        preprocessing_patterns = preprocessing_detector.detect_patterns(analysis_result)
-
-        # Combine patterns from all detectors
-        patterns = dataflow_patterns + temporal_patterns + magic_patterns + preprocessing_patterns
+            except Exception as e:
+                console.print(f"    ❌ Failed to analyze {target_file}: {e}", style="red")
+                continue
 
         console.print(
-            f"✅ Static analysis complete: {len(patterns)} patterns detected",
+            f"✅ Analysis complete: {len(all_patterns)} total patterns across {files_analyzed} files",
             style="green",
         )
 
-        # Runtime monitoring integration
-        console.print("⚡ Running target with monitoring...", style="dim")
-        monitor_logs = execute_with_monitoring(target_file)
-
-        return patterns, monitor_logs
+        return all_patterns, all_monitor_logs, files_analyzed
 
     except Exception as e:
         console.print(f"❌ Analysis failed: {e}", style="bold red")
-        return [], {}
+        return [], {}, 0
 
 
-def transform_results(patterns, monitor_logs, target_file):
+def transform_results(patterns, monitor_logs, target_path, files_analyzed):
     """
     Transform raw analysis results into report-ready data structures
 
     Args:
         patterns (list): ML patterns from detector
         monitor_logs (dict): Runtime monitoring data
-        target_file (str): Original target file path
+        target_path (str): Original target file/directory path
+        files_analyzed (int): Number of files analyzed
 
     Returns:
         tuple: (summary_data, pattern_distribution, findings_list)
@@ -197,11 +242,16 @@ def transform_results(patterns, monitor_logs, target_file):
         else 0.0
     )
 
-    # Extract project info from file path
-    project_name = Path(target_file).stem
+    # Extract project info from file/directory path
+    if os.path.isdir(target_path):
+        project_name = Path(target_path).name
+        project_type = "Repository Analysis"
+    else:
+        project_name = Path(target_path).stem
+        project_type = "Single File Analysis"
 
     summary_data = {
-        "files_analyzed": 1,  # Single file for now
+        "files_analyzed": files_analyzed,
         "patterns_identified": total_patterns,
         "high_impact": high_impact,
         "medium_impact": medium_impact,
@@ -209,7 +259,7 @@ def transform_results(patterns, monitor_logs, target_file):
         "avg_confidence": round(avg_confidence * 100, 1),  # Convert to percentage
         "analysis_time_sec": monitor_logs.get("duration_seconds", 0.0),
         "target_project": project_name,
-        "project_type": "ML Code Analysis",
+        "project_type": project_type,
     }
 
     # Build pattern distribution by type with better categorization
@@ -245,7 +295,7 @@ def transform_results(patterns, monitor_logs, target_file):
         finding = {
             "type": pattern.pattern_type,
             "severity": pattern.severity.name,
-            "file": target_file,
+            "file": getattr(pattern, 'file_path', target_path),
             "line": pattern.line_number,
             "message": pattern.message,
             "confidence": pattern.confidence,
@@ -255,17 +305,18 @@ def transform_results(patterns, monitor_logs, target_file):
     return summary_data, pattern_distribution, findings_list
 
 
-def analyze_and_report(target_file, context="time-series"):
+def analyze_and_report(target_path, context="time-series"):
     """
-    Complete pipeline: analyze file and generate report with real data
+    Complete pipeline: analyze file/directory and generate report with real data
 
     Args:
-        target_file (str): Path to Python file to analyze
+        target_path (str): Path to Python file or directory to analyze
+        context (str): ML domain context for analysis
     """
     console = Console()
 
     # Step 1: Run analysis
-    patterns, monitor_logs = run_full_analysis(target_file, context)
+    patterns, monitor_logs, files_analyzed = run_full_analysis(target_path, context)
 
     if not patterns:
         console.print("ℹ️  No patterns detected or analysis failed", style="yellow")
@@ -273,15 +324,19 @@ def analyze_and_report(target_file, context="time-series"):
 
     # Step 2: Transform results
     summary_data, pattern_distribution, findings_list = transform_results(
-        patterns, monitor_logs, target_file
+        patterns, monitor_logs, target_path, files_analyzed
     )
 
     # Step 3: Generate report with real data
-    console.print("\n🎯 Generating Report with Real Data", style="bold green")
-    console.print("=" * 50)
+    console.print("\n🎯 ATTRAHERE V4 BLIND ANALYSIS REPORT", style="bold green")
+    console.print("=" * 60)
 
     print_report_header(summary_data)
     print_summary_table(summary_data)
+
+    # Print pattern distribution
+    if pattern_distribution:
+        print_pattern_distribution_table(pattern_distribution)
 
     # Print real findings
     console.print("🚨 REAL FINDINGS DETECTED", style="bold red")
@@ -291,11 +346,13 @@ def analyze_and_report(target_file, context="time-series"):
         severity_emoji = {"HIGH": "🚨", "MEDIUM": "⚠️", "LOW": "💡"}.get(
             finding["severity"], "🔍"
         )
+        file_name = Path(finding['file']).name
         console.print(
-            f"• {severity_emoji} {finding['type']} - {Path(finding['file']).name}:{finding['line']}"
+            f"• {severity_emoji} {finding['type']} - {file_name}:{finding['line']}"
         )
         console.print(f"  💬 {finding['message']}")
         console.print(f"  🎯 Confidence: {finding['confidence']:.0%}")
+        console.print(f"  📁 File: {finding['file']}")
         console.print()
 
     # Recommendations based on real findings
@@ -313,6 +370,13 @@ def analyze_and_report(target_file, context="time-series"):
 
         console.print(f"3. TOTAL: {len(findings_list)} patterns require attention")
         console.print()
+
+        # Add critical findings summary
+        console.print("🎯 MISSIONE 'PISTOLA FUMANTE' RISULTATO:", style="bold magenta")
+        if high_priority:
+            console.print(f"✅ TROVATI {len(high_priority)} CRITICAL DATA LEAKAGE BUGS!", style="bold green")
+        else:
+            console.print("❌ Nessun critical bug trovato", style="yellow")
 
 
 def generate_cli_header(results):

@@ -226,7 +226,7 @@ export default function BetaRequestForm({
           ) : (
             <>
               <Mail className="h-6 w-6 mr-3" />
-              Richiedi Demo Esclusiva
+              Richiedi Accesso alla Beta Privata
             </>
           )}
         </Button>

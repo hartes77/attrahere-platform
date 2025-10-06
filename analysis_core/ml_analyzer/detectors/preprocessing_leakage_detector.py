@@ -19,7 +19,7 @@ import ast
 from typing import Dict, List, Any, Optional, Set
 
 from .base_detector import BaseMLDetector, MLAntiPattern, PatternSeverity
-from ..ast_engine import ASTAnalysisResult
+from ..ast_engine import ASTAnalysisResult, DatasetType, DataLineage
 from ..scope_analyzer import ScopeAwareAnalyzer
 
 
@@ -48,6 +48,14 @@ class PreprocessingLeakageDetector(BaseMLDetector):
 
         # Methods that fit/learn from data (cause leakage if used before split)
         self.fit_methods = {'fit', 'fit_transform'}
+        
+        # V5 Intent-Aware: Contexts where preprocessing is SAFE (exclusion rules)
+        self.safe_contexts = {
+            'scoring_function',  # Functions that compute metrics
+            'evaluation_function',  # Model evaluation
+            'utility_function',  # Helper/utility functions
+            'test_function'  # Unit tests
+        }
         
         # Data splitting functions
         self.split_functions = {'train_test_split', 'KFold', 'StratifiedKFold', 'TimeSeriesSplit'}
@@ -94,6 +102,10 @@ class PreprocessingLeakageDetector(BaseMLDetector):
                         validation = self.scope_analyzer.validate_pattern_in_scope(
                             op.line, 'preprocessing_before_split', scope_context
                         )
+                        
+                        # V5 Intent-Aware: Apply semantic exclusion rules
+                        if self._should_exclude_pattern_v5(op, analysis):
+                            continue  # Skip this pattern - it's safe based on intent
                         
                         # Only create pattern if it's a real issue (not a false positive)
                         if validation['is_valid']:
@@ -319,3 +331,95 @@ X_test_scaled = {preprocessor}.transform(X_test)        # Apply to test without 
             return func_name in self.preprocessor_classes
 
         return False
+    
+    def _should_exclude_pattern_v5(self, operation, analysis: ASTAnalysisResult) -> bool:
+        """
+        V5 Intent-Aware Exclusion Rules
+        
+        Determines if a pattern should be excluded based on semantic understanding
+        of the code's intent and context.
+        
+        Returns True if pattern should be EXCLUDED (safe to ignore)
+        """
+        
+        # Rule 1: Check if operation is in a scoring/evaluation function
+        if self._is_in_scoring_function(operation, analysis):
+            return True
+            
+        # Rule 2: Check data lineage - is this operating on safe training data?
+        if self._is_operating_on_safe_data(operation, analysis):
+            return True
+            
+        # Rule 3: Check if this is within CV fold (legitimate preprocessing)
+        if self._is_within_cv_fold(operation, analysis):
+            return True
+            
+        # Rule 4: Check if this is a utility/helper function
+        if self._is_utility_function(operation, analysis):
+            return True
+            
+        return False  # Pattern is suspicious - don't exclude
+    
+    def _is_in_scoring_function(self, operation, analysis: ASTAnalysisResult) -> bool:
+        """Check if operation is within a scoring/evaluation function"""
+        
+        # Get function context
+        function_context = self._get_function_context(operation.line, analysis.ast_tree)
+        if not function_context:
+            return False
+            
+        func_name = function_context.lower()
+        
+        # Common scoring function patterns
+        scoring_patterns = [
+            'score', 'eval', 'gini', 'auc', 'metric', 'assess', 'validate',
+            'accuracy', 'precision', 'recall', 'f1'
+        ]
+        
+        return any(pattern in func_name for pattern in scoring_patterns)
+    
+    def _is_operating_on_safe_data(self, operation, analysis: ASTAnalysisResult) -> bool:
+        """Check if operation is on training data only (via data lineage)"""
+        
+        if not hasattr(analysis, 'data_lineage'):
+            return False
+            
+        # Check variables used in this operation
+        for var_name, lineage in analysis.data_lineage.items():
+            if lineage.contamination_risk <= 0.2:  # Low risk = training data
+                return True
+                
+        return False
+    
+    def _is_within_cv_fold(self, operation, analysis: ASTAnalysisResult) -> bool:
+        """Check if operation is within a CV fold (legitimate)"""
+        
+        function_context = self._get_function_context(operation.line, analysis.ast_tree)
+        if not function_context:
+            return False
+            
+        # Look for CV-related code patterns
+        cv_patterns = ['fold', 'cv', 'cross_val', 'kfold']
+        return any(pattern in function_context.lower() for pattern in cv_patterns)
+    
+    def _is_utility_function(self, operation, analysis: ASTAnalysisResult) -> bool:
+        """Check if this is a utility/helper function"""
+        
+        function_context = self._get_function_context(operation.line, analysis.ast_tree)
+        if not function_context:
+            return False
+            
+        utility_patterns = ['util', 'helper', 'preprocess', 'transform', 'encode']
+        return any(pattern in function_context.lower() for pattern in utility_patterns)
+    
+    def _get_function_context(self, line_number: int, ast_tree: ast.AST) -> Optional[str]:
+        """Get the name of the function containing the given line"""
+        
+        for node in ast.walk(ast_tree):
+            if isinstance(node, ast.FunctionDef):
+                if hasattr(node, 'lineno') and hasattr(node, 'end_lineno'):
+                    if node.lineno <= line_number <= (node.end_lineno or node.lineno):
+                        return node.name
+        
+        return None
+

@@ -42,12 +42,6 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <AttrahereLogo size="md" showText={true} className="text-sky-500" />
           <div className="flex items-center gap-6">
-            <Link
-              href="/login"
-              className="text-slate-300 hover:text-sky-400 transition-colors"
-            >
-              Accedi
-            </Link>
             <Button className="bg-sky-500 hover:bg-sky-600 text-white button-relief">
               Richiedi Demo
             </Button>
@@ -101,34 +95,15 @@ export default function LandingPage() {
             <Button
               variant="outline"
               className="ml-4 border-slate-600 text-slate-300 hover:bg-slate-800 px-8 py-6 text-lg font-bold button-relief"
-            >
-              <Brain className="h-6 w-6 mr-3" />
-              🎬 VEDI DEMO
-            </Button>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <Button
-              size="lg"
-              className="bg-sky-500 hover:bg-sky-600 text-white px-10 py-6 text-xl font-bold button-relief"
               asChild
             >
-              <Link href="/login">
-                <Rocket className="h-6 w-6 mr-3" />
-                Prova Subito Gratis
-                <ChevronRight className="h-6 w-6 ml-2" />
+              <Link href="/demo">
+                <Brain className="h-6 w-6 mr-3" />
+                🎬 VEDI DEMO
               </Link>
             </Button>
-
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-slate-600 text-slate-300 hover:bg-slate-800 px-10 py-6 text-xl font-bold button-relief"
-            >
-              <Brain className="h-6 w-6 mr-3" />
-              Guarda la Demo AI
-            </Button>
           </div>
+
         </div>
       </section>
 
@@ -198,24 +173,36 @@ export default function LandingPage() {
             La tecnologia è già validata - Il prodotto sta arrivando
           </h2>
 
-          <div className="card-relief-strong p-8 max-w-4xl mx-auto">
-            <h3 className="text-2xl font-bold text-slate-100 mb-6">TECNOLOGIA TESTATA SU:</h3>
-            <div className="grid md:grid-cols-2 gap-6 text-left">
-              <div className="flex items-center gap-3">
-                <span className="text-green-400">•</span>
-                <span className="text-slate-300">HuggingFace Transformers (5.289 file)</span>
+          <div className="card-relief-strong p-8 max-w-6xl mx-auto">
+            <h3 className="text-2xl font-bold text-slate-100 mb-8 text-center">Attrahere distingue tra Critical Bugs e Code Quality Issues</h3>
+            
+            <div className="grid md:grid-cols-2 gap-8 mb-8">
+              <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-6">
+                <h4 className="text-xl font-bold text-red-400 mb-4">🚨 CRITICAL BUGS RILEVATI (test.py):</h4>
+                <div className="space-y-2 text-slate-300">
+                  <div>• 3 data leakage reali che compromettono il modello</div>
+                  <div>• Errori concettuali gravi</div>
+                  <div>• Impatto diretto sulle performance</div>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-green-400">•</span>
-                <span className="text-slate-300">Competizioni Kaggle (Porto Seguro 2° posto)</span>
+
+              <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-6">
+                <h4 className="text-xl font-bold text-yellow-400 mb-4">⚠️ CODE QUALITY WARNINGS (Porto Seguro):</h4>
+                <div className="space-y-2 text-slate-300">
+                  <div>• Magic numbers da parametrizzare</div>
+                  <div>• Best practices da migliorare</div>
+                  <div>• Nessun impatto sulla correttezza</div>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-green-400">•</span>
-                <span className="text-slate-300">Codebase enterprise (400k+ LOC)</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-green-400">•</span>
-                <span className="text-slate-300">Zero falsi positivi dimostrati</span>
+            </div>
+
+            <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-6">
+              <h4 className="text-xl font-bold text-green-400 mb-4">✅ ENTERPRISE VALIDATION (HuggingFace Transformers):</h4>
+              <div className="grid md:grid-cols-2 gap-4 text-slate-300">
+                <div>• 15+ file critici analizzati</div>
+                <div>• 0 data leakage rilevati</div>
+                <div>• Enterprise-grade codebase confermato</div>
+                <div>• 100% precision dimostrata</div>
               </div>
             </div>
           </div>
@@ -223,7 +210,7 @@ export default function LandingPage() {
       </section>
 
       {/* Founder Section */}
-      <section className="py-20 px-8 bg-gradient-to-r from-purple-900/30 to-blue-900/30">
+      <section id="founder-section" className="py-20 px-8 bg-gradient-to-r from-purple-900/30 to-blue-900/30">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-slate-100 mb-8">
             Sto costruendo Attrahere e cerco il CTO per scalare
@@ -299,12 +286,14 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <Button
-              onClick={handleShowForm}
               size="lg"
               className="bg-sky-500 hover:bg-sky-600 text-white px-12 py-8 text-2xl font-bold button-relief"
+              asChild
             >
-              <Mail className="h-8 w-8 mr-4" />
-              🎬 GUARDA LA DEMO LIVE
+              <Link href="/demo">
+                <Mail className="h-8 w-8 mr-4" />
+                🎬 GUARDA LA DEMO LIVE
+              </Link>
             </Button>
             <Button
               onClick={handleShowForm}
